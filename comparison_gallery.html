@@ -1,0 +1,556 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Higgsfield AI - Performance Dashboard</title>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --bg: #0a0a0c;
+                --card-bg: rgba(255, 255, 255, 0.03);
+                --accent: #00f2ff;
+                --accent-gradient: linear-gradient(135deg, #00f2ff 0%, #0072ff 100%);
+                --text: #ffffff;
+                --text-muted: #a0a0ab;
+                --border: rgba(255, 255, 255, 0.1);
+                --success: #00ffa3;
+            }
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            
+            body {
+                font-family: 'Outfit', sans-serif;
+                background-color: var(--bg);
+                color: var(--text);
+                line-height: 1.6;
+                padding: 40px 20px;
+                background-image: 
+                    radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(0, 114, 255, 0.05) 0%, transparent 40%);
+                min-height: 100vh;
+            }
+
+            .container { max-width: 1400px; margin: 0 auto; }
+
+            header {
+                text-align: center;
+                margin-bottom: 60px;
+            }
+
+            h1 {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+                background: var(--accent-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -1px;
+            }
+
+            header p {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+            }
+
+            .metric-legend {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 30px;
+                background: var(--card-bg);
+                padding: 15px;
+                border-radius: 12px;
+                border: 1px solid var(--border);
+            }
+
+            .metric-info { font-size: 0.8rem; color: var(--text-muted); }
+            .metric-info strong { color: var(--accent); }
+
+            section { margin-bottom: 80px; }
+
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            h2::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: var(--border);
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+                gap: 30px;
+            }
+
+            .card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 24px;
+                backdrop-filter: blur(10px);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow: hidden;
+            }
+
+            .card:hover {
+                transform: translateY(-8px);
+                border-color: rgba(0, 242, 255, 0.3);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .model-badge {
+                background: rgba(0, 242, 255, 0.1);
+                color: var(--accent);
+                padding: 4px 12px;
+                border-radius: 100px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .media-container {
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                background: #111;
+                aspect-ratio: 16/9;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            img, video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .metrics-overlay {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                padding-top: 15px;
+                border-top: 1px solid var(--border);
+            }
+
+            .metric-box {
+                background: rgba(255, 255, 255, 0.02);
+                padding: 8px 12px;
+                border-radius: 8px;
+            }
+
+            .metric-label {
+                font-size: 0.65rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            .metric-value {
+                font-weight: 600;
+                font-size: 0.95rem;
+                color: var(--text);
+            }
+
+            .value-success { color: var(--success); }
+
+            .footer {
+                margin-top: 100px;
+                text-align: center;
+                padding: 40px;
+                border-top: 1px solid var(--border);
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Higgsfield AI Benchmarking</h1>
+                <p>Automated Model Performance & Quality Analytics</p>
+                <div class="metric-legend">
+                    <div class="metric-info"><strong>Latency:</strong> Processing Speed (Lower Better)</div>
+                    <div class="metric-info"><strong>CLIP:</strong> Prompt Alignment (Higher Better)</div>
+                    <div class="metric-info"><strong>Temp Consist:</strong> Video Smoothness (Higher Better)</div>
+                    <div class="metric-info"><strong>Stability:</strong> Polling Steps (Lower Better)</div>
+                </div>
+            </header>
+            
+            <section>
+                <h2>🖼 Image Models</h2>
+                <div class="grid">
+    
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Seedream v4 Edit</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Seedream v4 Edit.jpg" alt="Seedream v4 Edit" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">21.1s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">37.97</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">21 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.344</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Seedream v4 T2I</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Seedream v4 T2I.jpg" alt="Seedream v4 T2I" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">15.08s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">37.48</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">15 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.2994</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Soul 2.0 Pro</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Soul 2.0 Pro.jpg" alt="Soul 2.0 Pro" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">11.14s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">36.04</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">11 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.5127</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Soul Character</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Soul Character.jpg" alt="Soul Character" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">12.11s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">29.91</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">12 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.5149</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Soul Cinematic</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Soul Cinematic.jpg" alt="Soul Cinematic" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">14.08s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">33.65</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">14 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.5418</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Soul Reference</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Soul Reference.jpg" alt="Soul Reference" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">9.12s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">35.35</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">9 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.5311</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Soul Standard</span>
+                        </div>
+                        <div class="media-container">
+                            <img src="outputs/Soul Standard.jpg" alt="Soul Standard" loading="lazy">
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">13.06s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">CLIP Score</span>
+                                <span class="metric-value value-success">32.99</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">12 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">SSIM (Struct)</span>
+                                <span class="metric-value">0.4709</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+
+            <section>
+                <h2>🎬 Video Models</h2>
+                <div class="grid">
+    
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">DOP Standard</span>
+                        </div>
+                        <div class="media-container">
+                            <video controls preload="metadata">
+                                <source src="outputs/DOP Standard.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">92.66s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Temp Consist</span>
+                                <span class="metric-value value-success">0.9806</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">92 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Status</span>
+                                <span class="metric-value value-success">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">DOP Turbo</span>
+                        </div>
+                        <div class="media-container">
+                            <video controls preload="metadata">
+                                <source src="outputs/DOP Turbo.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">104.78s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Temp Consist</span>
+                                <span class="metric-value value-success">0.9731</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">104 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Status</span>
+                                <span class="metric-value value-success">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Kling 2.1 Pro</span>
+                        </div>
+                        <div class="media-container">
+                            <video controls preload="metadata">
+                                <source src="outputs/Kling 2.1 Pro.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">75.45s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Temp Consist</span>
+                                <span class="metric-value value-success">0.9719</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">75 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Status</span>
+                                <span class="metric-value value-success">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Kling 3.0 Pro</span>
+                        </div>
+                        <div class="media-container">
+                            <video controls preload="metadata">
+                                <source src="outputs/Kling 3.0 Pro.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">102.07s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Temp Consist</span>
+                                <span class="metric-value value-success">0.9963</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">101 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Status</span>
+                                <span class="metric-value value-success">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="model-badge">Seedance Pro</span>
+                        </div>
+                        <div class="media-container">
+                            <video controls preload="metadata">
+                                <source src="outputs/Seedance Pro.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="metrics-overlay">
+                            <div class="metric-box">
+                                <span class="metric-label">Latency</span>
+                                <span class="metric-value">60.33s</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Temp Consist</span>
+                                <span class="metric-value value-success">0.9858</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Stability</span>
+                                <span class="metric-value">60 steps</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Status</span>
+                                <span class="metric-value value-success">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+            </section>
+            
+            <footer class="footer">
+                <p>&copy; 2026 AI Benchmarking Suite &middot; Perceptual Quality Verified</p>
+            </footer>
+        </div>
+    </body>
+    </html>
+    
