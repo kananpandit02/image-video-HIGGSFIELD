@@ -1,4 +1,4 @@
-###🚀 Higgsfield AI API Benchmarking Report
+### 🚀 Higgsfield AI API Benchmarking Report
 # Comprehensive Evaluation of Multi-Modal Generative AI Systems
 
 ---
