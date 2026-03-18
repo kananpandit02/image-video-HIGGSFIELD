@@ -168,6 +168,38 @@ The clouds move slowly across the sunset sky
 * Outputs saved in `outputs/` directory
 
 ---
+# 🔷 4.1 Reference Image (For Evaluation)
+
+To ensure consistent evaluation across all models, a common reference image was used for structural and perceptual comparison.
+
+🔗 **Reference Image Link:**
+https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg
+
+## 🔹 Purpose of Reference Image
+
+* Used for **SSIM (Structural Similarity)** calculation
+* Used for **LPIPS (Perceptual Similarity)** comparison
+* Ensures **fair benchmarking across models**
+
+## 🔹 Why this Image?
+
+* Contains **complex structure (architecture + nature)**
+* Includes **lighting variation (sunset)**
+* Useful for evaluating:
+
+  * Detail preservation
+  * Texture realism
+  * Depth and composition
+
+---
+
+## 🔹 How it is used in the system
+
+* Downloaded automatically during evaluation
+* Resized to standard resolution (512×512)
+* Compared against generated outputs
+
+
 
 # 🔷 5. Evaluation Metrics
 
@@ -287,6 +319,7 @@ The clouds move slowly across the sunset sky
 * Most realistic motion and physics
 
 ---
+
 
 ### 5. Failure Case
 
