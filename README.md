@@ -1,25 +1,18 @@
-# 🚀 AI Image & Video Model Benchmarking Report
-
+🚀 Higgsfield AI API Benchmarking Report
 ### Comprehensive Evaluation of Multi-Modal Generative AI Systems
 
 ---
 
 # 🔷 1. Introduction
+This project presents a comprehensive evaluation of the Higgsfield AI API ecosystem, focusing on benchmarking multiple integrated models for image and video generation tasks.
 
-With the rapid advancement of generative AI, multiple models now exist for image and video generation. However, selecting the optimal model for a specific use case (speed, quality, editing, or animation) remains a challenge.
+The objective is to analyze model performance across:
 
-This project aims to build a **systematic benchmarking framework** to evaluate and compare multiple state-of-the-art AI models across three major tasks:
+Prompt-to-Image generation
 
-* Text-to-Image Generation
-* Image-to-Image Transformation
-* Image-to-Video Generation
+Image-to-Image transformation
 
-The primary objective is to analyze models based on:
-
-* Performance (Latency, Stability)
-* Output Quality (CLIP Score, SSIM, LPIPS)
-* Reliability (Success Rate)
-
+Image-to-Video animation
 ---
 
 # 🔷 2. System Architecture
